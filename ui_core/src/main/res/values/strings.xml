@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ui_core</string>
+    <string name="open">ouvrir</string>
+    <string name="close">Fermer</string>
+</resources>

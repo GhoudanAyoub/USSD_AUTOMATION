@@ -1,0 +1,121 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import com.gws.ussd.CI
+import com.gws.ussd.Deps
+
+plugins {
+//    id("com.google.gms.google-services") version "4.4.0" apply false
+    id("com.android.application") version "7.2.2" apply false
+    id("com.android.library") version "7.2.2" apply false
+    id("org.jetbrains.kotlin.android") version "1.7.10" apply false
+    id("com.google.dagger.hilt.android") version "2.44" apply false
+    id("org.jetbrains.kotlin.jvm") version "1.7.10"
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.7.10"
+    id("androidx.navigation.safeargs.kotlin") version "2.4.2" apply false
+    id 'com.diffplug.spotless' version '6.4.2'
+    id("com.google.gms.google-services") version "4.3.10" apply false
+}
+
+
+allprojects {
+    group = "com.gws.ussd"
+}
+
+
+
+Properties props = new Properties()
+props.load(new FileInputStream(file('modules.properties')))
+def appModules = props.getProperty('appModules').split(",")
+
+
+subprojects {
+
+    repositories {
+        maven { url "https://jitpack.io" } // Specify the URL inside 'url'
+    }
+
+    if (appModules.contains(it.name)) {
+        if (it.name == 'app') {
+            apply plugin: 'com.android.application'
+            apply plugin: 'org.jetbrains.kotlin.android'
+        } else {
+            apply plugin: 'com.android.library'
+        }
+        apply plugin: 'kotlin-android'
+        apply plugin: 'kotlin-parcelize'
+        apply plugin: 'com.diffplug.spotless'
+
+        android {
+            compileSdkVersion 34
+            namespace = "com.gws.ussd"
+            defaultConfig {
+                minSdkVersion 24
+                targetSdkVersion 34
+                versionCode CI.versionCode
+                versionName CI.publishVersion
+
+                vectorDrawables {
+                    useSupportLibrary true
+                }
+
+                testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+                compileOptions {
+                    sourceCompatibility CI.jvmTarget
+                    targetCompatibility CI.jvmTarget
+                }
+
+                kotlinOptions {
+                    jvmTarget = CI.jvmTarget
+                }
+
+                testOptions {
+                    unitTests.all {
+                        useJUnitPlatform()
+                    }
+                }
+
+                buildFeatures {
+                    viewBinding true
+                }
+
+                packagingOptions {
+                    resources {
+                        excludes += ['/*.jar', '/META-INF/{AL2.0,LGPL2.1}',
+                                     '**/attach_hotspot_windows.dll',
+                                     'META-INF/licenses/**',
+                                     'META-INF/LICENSE*']
+                    }
+                }
+            }
+
+            buildFeatures {
+                viewBinding true
+            }
+        }
+    } else {
+        apply plugin: 'java-library'
+        apply plugin: 'kotlin'
+    }
+}
+spotless {
+    kotlin {
+        target '**/*.kt'
+        targetExclude("$buildDir/**/*.kt")
+        targetExclude('bin/**/*.kt')
+
+        ktlint('0.43.2').userData([max_line_length: "100"])
+    }
+}
+
+
+tasks.withType(Test) {
+    def n = Runtime.getRuntime().availableProcessors() / 2
+    maxParallelForks = n > 0 ? n : 1
+    testLogging {
+        events("passed",
+                "skipped",
+                "failed",
+                "standard_out",
+                "standard_error")
+    }
+}

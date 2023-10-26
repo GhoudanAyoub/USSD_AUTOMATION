@@ -1,0 +1,7 @@
+<resources>
+
+    <style name="Widget.Theme.TheMovieDbAssessment.MyView" parent="">
+        <item name="android:background">@color/content_lightGrey</item>
+        <item name="exampleColor">@color/brand_primary</item>
+    </style>
+</resources>

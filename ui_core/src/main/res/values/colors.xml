@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="brand_primary">#11314F</color>
+    <color name="brand_secondary">#EB6C43</color>
+    <color name="brand_bright">#F18800</color>
+    <color name="brand_hover">#153D63</color>
+    <color name="brand_pastel">#EDF8FF</color>
+
+    <color name="content_dark__80op">#CC1D2939</color>
+    <color name="content_dark">#1D2939</color>
+    <color name="content_darkGrey">#667085</color>
+    <color name="content_Grey">#98A2B3</color>
+    <color name="content_lightGrey">#E4E7EC</color>
+    <color name="content_softGrey">#F2F4F7</color>
+    <color name="content_ultraLightGrey">#F9FAFB</color>
+    <color name="content_lightOrange">#FFEAD5</color>
+    <color name="content_white">#FFFFFF</color>
+
+    <color name="transparent">#00FFFFFF</color>
+    <color name="status_success">#039855</color>
+    <color name="status_alert">#FFC700</color>
+    <color name="status_error">#E03636</color>
+    <color name="status_successLight">#EDFFF7</color>
+    <color name="status_alertLight">#FFF4DF</color>
+    <color name="status_errorLight">#FFE2E0</color>
+    <color name="light_blue_400">#FF29B6F6</color>
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="gray_400">#FFBDBDBD</color>
+    <color name="gray_600">#FF757575</color>
+</resources>
