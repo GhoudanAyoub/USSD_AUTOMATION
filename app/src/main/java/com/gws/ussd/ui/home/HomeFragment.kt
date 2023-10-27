@@ -156,6 +156,7 @@ class HomeFragment : Fragment() {
 
     fun runUSSDWithCodeList() {
         if (currentIndex < ussdList.size) {
+            currentCodeIndex = 0
             val ussd = ussdList[currentIndex]
             codeList = ussd.duplicateSteps()
 

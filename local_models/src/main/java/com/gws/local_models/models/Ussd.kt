@@ -56,7 +56,7 @@ fun Ussd.duplicateSteps(): List<String> {
 
     for ((index, item) in inputList.withIndex()) {
         resultList.add(item)
-        if (index < inputList.size - 1) {
+        if (index > 0) {
             resultList.add(item)
         }
     }
