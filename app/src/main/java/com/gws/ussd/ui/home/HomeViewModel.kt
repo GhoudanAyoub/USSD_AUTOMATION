@@ -88,9 +88,11 @@ class HomeViewModel @Inject constructor(
 
                             )
                         ussdRepository.updateUssd(updateUssdRequest)
+                            .collect { result ->
+                                Timber.e("Ussd: Updated ${ussd.id} ${ussd.reponceussd} ${ussd.etat}")
+                            }
                         UssdLiveData.value?.data?.filter { it.id==ussd.id }
                             ?.map { it.etat = ussd.etat?: "0"  }
-                        Timber.e("Ussd: Updated ${ussd.id} ${ussd.etat}")
                     }
                 }
             }
