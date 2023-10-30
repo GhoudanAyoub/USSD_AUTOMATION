@@ -178,7 +178,7 @@ class HomeFragment : Fragment() {
                                 ussd.reponceussd = message
                                 ussd.etat = "1"
                                 viewModel?.updateList(ussd)
-                                currentIndex + 1
+                                currentIndex++
                                 runUSSDWithCodeList()
                             }
 
@@ -187,7 +187,7 @@ class HomeFragment : Fragment() {
                                     ussd.reponceussd = message
                                     ussd.etat = "0"
                                     viewModel?.updateList(ussd)
-                                    currentIndex + 1
+                                    currentIndex++
                                     runUSSDWithCodeList()
                                 }
                             }
