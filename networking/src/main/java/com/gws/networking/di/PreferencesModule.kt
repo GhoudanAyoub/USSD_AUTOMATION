@@ -38,7 +38,7 @@ object PreferencesModule {
         json: Json,
         @Named(AUTH_USER_OBJECT) sharedPreferences: SharedPreferences
      ) = object : CurrentUserProvider {
-        override suspend fun currentUser(): UserEntity? {
+        override fun currentUser(): UserEntity? {
 
             val userCredentialsJson = sharedPreferences.getString(
                 AUTH_USER_OBJECT,

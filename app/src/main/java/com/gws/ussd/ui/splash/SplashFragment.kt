@@ -1,7 +1,6 @@
 package com.gws.ussd.ui.splash
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,13 +14,13 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.ktx.remoteConfigSettings
 import com.gws.common.utils.UssdNavigation
+import com.gws.networking.providers.CurrentServerProvider
 import com.gws.networking.providers.CurrentUserProvider
 import com.gws.ussd.MainActivity
 import com.gws.ussd.databinding.FragmentSplashBinding
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.delay
-import timber.log.Timber
 
 @AndroidEntryPoint
 class SplashFragment : Fragment() {
@@ -30,6 +29,9 @@ class SplashFragment : Fragment() {
 
     @Inject
     lateinit var currentUserProvider: CurrentUserProvider
+
+    @Inject
+    lateinit var currentServerProvider: CurrentServerProvider
     private var remoteConfig: FirebaseRemoteConfig? = null
 
     override fun onCreateView(
@@ -58,19 +60,33 @@ class SplashFragment : Fragment() {
             ?.addOnCompleteListener(requireActivity()) { task ->
                 if (task.isSuccessful) {
                     val remoteConfigData = remoteConfig?.getString("allowApp")
-                    if(remoteConfigData.toString() == "true"){
+                    if (remoteConfigData.toString() == "true") {
                         lifecycleScope.launchWhenResumed {
                             delay(2000)
-                            if (currentUserProvider.currentUser() == null) {
+                            if (currentServerProvider.currentServer() == null) {
                                 val goLogin =
                                     SplashFragmentDirections.actionSplashFragmentToServerFragment()
                                 UssdNavigation.navigate(findNavController(), goLogin)
                             } else {
-                                startActivity(Intent(requireActivity(), MainActivity::class.java))
-                                requireActivity().finish()
+                                if (currentUserProvider.currentUser() == null) {
+                                    currentServerProvider.currentServer()?.let {
+                                        val goLogin =
+                                            SplashFragmentDirections
+                                                .actionSplashFragmentToLoginFragment(server = it)
+                                        UssdNavigation.navigate(findNavController(), goLogin)
+                                    }
+                                } else {
+                                    startActivity(
+                                        Intent(
+                                            requireActivity(),
+                                            MainActivity::class.java
+                                        )
+                                    )
+                                    requireActivity().finish()
+                                }
                             }
                         }
-                    }else
+                    } else
                         Toast.makeText(
                             requireContext(),
                             "Trials version is expired, Contact Developer for more information",

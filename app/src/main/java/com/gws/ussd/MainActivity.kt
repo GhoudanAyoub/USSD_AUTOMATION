@@ -17,6 +17,7 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
@@ -83,10 +84,17 @@ class MainActivity : AppCompatActivity(){
         }
         navView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
+                R.id.navigation_home -> {
+                    navController.navigate(R.id.navigation_home)
+                    binding.drawerLayout.closeDrawers()
+                }
+                R.id.navigation_server -> {
+                    navController.navigate(R.id.navigation_server)
+                    binding.drawerLayout.closeDrawers()
+                }
                 R.id.logout -> {
                     CoroutineScope(Dispatchers.Default).launch {
                         currentUserProvider.clearUser()
-                        currentServerProvider.clearServer()
                     }
                     startActivity(Intent(this@MainActivity, SplashActivity::class.java))
                     this@MainActivity.finish()

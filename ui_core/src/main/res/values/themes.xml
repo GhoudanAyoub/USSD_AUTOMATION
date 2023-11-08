@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Theme.TheMovieDbAssessment" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/content_white</item>
+        <item name="colorPrimary">@color/brand_primary</item>
         <item name="colorPrimaryDark">@color/content_dark</item>
         <item name="colorAccent">@color/content_dark</item>
         <item name="drawerArrowStyle">@style/customNavigationBackIcon</item>
@@ -30,12 +30,12 @@
     </style>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.MaterialComponents.Light">
         <item name="colorControlNormal">@color/brand_hover</item>
-        <item name="android:textColorPrimary">@color/content_white</item>
+        <item name="android:textColorPrimary">@color/brand_primary</item>
     </style>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light">
-        <item name="colorControlNormal">@color/brand_hover</item>
-        <item name="android:textColorPrimary">@color/content_white</item>
+        <item name="colorControlNormal">@color/brand_primary</item>
+        <item name="android:textColorPrimary">@color/brand_primary</item>
     </style>
 
     <style name="NavigationViewItemStyle" parent="Theme.TheMovieDbAssessment">

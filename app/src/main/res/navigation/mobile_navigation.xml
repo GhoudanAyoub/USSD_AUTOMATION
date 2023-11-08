@@ -17,6 +17,7 @@
 
     <fragment
         android:id="@+id/navigation_server"
+        android:label="@string/title_server"
         android:name="com.gws.ussd.ui.server.ServerFragment"
         tools:layout="@layout/fragment_details" >
     </fragment>

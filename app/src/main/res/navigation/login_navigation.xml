@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_splashFragment_to_serverFragment"
             app:destination="@id/serverFragment" />
+        <action
+            android:id="@+id/action_splashFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
     <fragment
         android:id="@+id/loginFragment"

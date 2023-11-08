@@ -1,19 +1,19 @@
 package com.gws.ussd.ui.home
 
 import android.Manifest
-import android.app.PendingIntent
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.telephony.SubscriptionInfo
+import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
-import android.telephony.TelephonyManager.UssdResponseCallback
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
@@ -24,8 +24,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.gms.auth.api.credentials.Credential
-import com.google.android.gms.auth.api.credentials.Credentials
-import com.google.android.gms.auth.api.credentials.HintRequest
 import com.gws.common.utils.UssdVerticalItemDecoration
 import com.gws.local_models.models.Ussd
 import com.gws.local_models.models.duplicateSteps
@@ -39,7 +37,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.michaelrocks.libphonenumber.android.PhoneNumberUtil
 import javax.inject.Inject
 import kotlin.math.roundToInt
-import timber.log.Timber
 
 
 @AndroidEntryPoint
@@ -62,6 +59,7 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private val viewModel by activityViewModels<HomeViewModel>()
     private lateinit var serviceIntent: Intent
+    private val handler = Handler()
 
 
     private val ussdListAdapter: UssdListAdapter by lazy {
@@ -123,13 +121,13 @@ class HomeFragment : Fragment() {
             showPermissionRationaleDialog(requireContext())
         }
         setupMoviesList()
+        val numberOfSimCards = getNumberOfSimCards(requireContext())
+        binding.simNumber.text = StringBuilder()
+            .append(numberOfSimCards.toString())
+            .append(if (numberOfSimCards == 1) " carte SIM" else " cartes SIM")
 
         binding.valider.setOnClickListener {
-//            runUSSDWithCodeList("#111#", listOf("3","6","6", "3", "3", "5", "5"))
-//            (requireActivity() as? MainActivity)?.hideSoftKeyboard()
-//            requireActivity().startService(serviceIntent)
-//            (requireActivity() as? MainActivity)?.showLoader()
-//            viewModel.startBackgroundInfo()
+            scheduleButtonClick()
             runUSSDWithCodeList()
         }
     }
@@ -183,11 +181,11 @@ class HomeFragment : Fragment() {
                             }
 
                             else -> {
-                                    ussd.reponceussd = message
-                                    ussd.etat = "0"
-                                    viewModel?.updateList(ussd)
-                                    currentIndex++
-                                    runUSSDWithCodeList()
+                                ussd.reponceussd = message
+                                ussd.etat = "0"
+                                viewModel?.updateList(ussd)
+                                currentIndex++
+                                runUSSDWithCodeList()
                             }
                         }
                     }
@@ -277,167 +275,36 @@ class HomeFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         viewModel.clearList()
+        handler.removeCallbacksAndMessages(null)
     }
 
-    fun runussd2(ussd: String, ussdList: List<String>) {
-        var result = ""
-        var finish = false
-
-        val map = hashMapOf(
-            "KEY_LOGIN" to listOf("espere", "waiting", "loading", "esperando"),
-            "KEY_ERROR" to listOf("problema", "problem", "error", "null")
-        )
-        ussdApi.callUSSDInvoke(requireActivity(), ussd, 1, map,
-            object : USSDController.CallbackInvoke {
-                override fun responseInvoke(message: String) {
-                    result += "\n-\n$message"
-                    ussdApi.send("3") {
-                        result += "\n-\n$it"
-                        finish = false
-
-                        // Sleep for a moment (optional)
-                        try {
-                            Thread.sleep(500) // Sleep for 5 second
-                        } catch (e: InterruptedException) {
-                            e.printStackTrace()
-                        }
-                        ussdApi.send("6") {
-                            result += "\n-\n$it"
-                            finish = false
-                            // Sleep for a moment (optional)
-                            try {
-                                Thread.sleep(500) // Sleep for 5 second
-                            } catch (e: InterruptedException) {
-                                e.printStackTrace()
-                            }
-                            ussdApi.send("6") {
-                                result += "\n-\n$it"
-                                finish = false
-                                // Sleep for a moment (optional)
-                                try {
-                                    Thread.sleep(500) // Sleep for 5 second
-                                } catch (e: InterruptedException) {
-                                    e.printStackTrace()
-                                }
-                                ussdApi.send("3") {
-                                    result += "\n-\n$it"
-                                    finish = false
-                                    // Sleep for a moment (optional)
-                                    try {
-                                        Thread.sleep(500) // Sleep for 5 second
-                                    } catch (e: InterruptedException) {
-                                        e.printStackTrace()
-                                    }
-                                    ussdApi.send("3") {
-                                        result += "\n-\n$it"
-                                        finish = false
-                                        // Sleep for a moment (optional)
-                                        try {
-                                            Thread.sleep(500) // Sleep for 5 second
-                                        } catch (e: InterruptedException) {
-                                            e.printStackTrace()
-                                        }
-                                        ussdApi.send("5") {
-                                            result += "\n-\n$it"
-                                            finish = false
-                                            // Sleep for a moment (optional)
-                                            try {
-                                                Thread.sleep(500) // Sleep for 5 second
-                                            } catch (e: InterruptedException) {
-                                                e.printStackTrace()
-                                            }
-                                            ussdApi.send("5") {
-                                                result += "\n-\n$it"
-                                                finish = false
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                override fun over(message: String) {
-                    result += "\n-\n$message"
-                    when {
-                        finish -> Timber.i("État Ussd réussi")
-                        else -> Timber.i("Erreur UssdState")
-                    }
-                }
-            })
-    }
-
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun runUssd() {
-        val telephonyManager =
-            requireActivity().getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-
-        try {
-            telephonyManager.sendUssdRequest("#111*3*6*3*6#", object : UssdResponseCallback() {
-                override fun onReceiveUssdResponse(
-                    telephonyManager: TelephonyManager,
-                    request: String,
-                    response: CharSequence
-                ) {
-                    // Handle the USSD response
-                    Timber.e("Sync: response $response")
-                }
-
-                override fun onReceiveUssdResponseFailed(
-                    telephonyManager: TelephonyManager,
-                    request: String,
-                    failureCode: Int
-                ) {
-                    // Handle failure
-                    Timber.e("Sync: failureCode $failureCode")
-                }
-            }, null)
-
-        } catch (e: SecurityException) {
-            // Permission denied; request the permission
-        }
-    }
-
-    fun getPhoneNumber(context: Context): String {
-//        detectPhoneNumber()
-        val telephonyManager =
-            context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        var phoneNumber = ""
-
-        try {
-            phoneNumber = telephonyManager.line1Number ?: ""
-        } catch (e: SecurityException) {
-            // Permission denied; request the permission
-            if (ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.READ_PHONE_NUMBERS
-                )
-                != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.CALL_PHONE
-                )
-                != PackageManager.PERMISSION_GRANTED
+    fun getNumberOfSimCards(context: Context): Int {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            val subscriptionManager =
+                requireContext().getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+            if (ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.READ_PHONE_STATE
+                ) != PackageManager.PERMISSION_GRANTED
             ) {
-                // You can show a rationale for needing the permission here
-                // For example, display a dialog explaining why the permission is required
-                // Once the user acknowledges the rationale, request the permission
-                showPermissionRationaleDialog(requireContext())
+                return 0
             }
+            val activeSubscriptions: List<SubscriptionInfo> =
+                subscriptionManager.activeSubscriptionInfoList
+
+            return activeSubscriptions.size
+        } else {
+            val telephonyManager =
+                context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            return if (telephonyManager.simState == TelephonyManager.SIM_STATE_READY) 1 else 0
         }
-
-        return phoneNumber
     }
 
-    private fun detectPhoneNumber() {
-        val hintRequest = HintRequest.Builder()
-            .setPhoneNumberIdentifierSupported(true)
-            .build()
-        val intent: PendingIntent = Credentials.getClient(
-            requireActivity()
-        ).getHintPickerIntent(hintRequest)
-        val intentSenderRequest = IntentSenderRequest.Builder(intent.intentSender)
-        hintPhoneNumberLauncher.launch(intentSenderRequest.build())
+    private fun scheduleButtonClick() {
+        handler.postDelayed({
+            binding.valider.performClick()
+            scheduleButtonClick()
+        }, 600_000) // 600,000 milliseconds = 10 minutes
     }
+
 }

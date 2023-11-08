@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">USSD</string>
     <string name="title_home">Acceuil</string>
-    <string name="title_dashboard">Favorite</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_server">Base de données </string>
 </resources>

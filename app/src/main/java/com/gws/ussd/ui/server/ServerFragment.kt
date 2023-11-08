@@ -10,8 +10,13 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.gws.common.utils.UssdNavigation
 import com.gws.networking.model.SerEntity
-import dagger.hilt.android.AndroidEntryPoint
+import com.gws.networking.providers.CurrentUserProvider
 import com.gws.ussd.databinding.FragmentDetailsBinding
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class ServerFragment : Fragment() {
@@ -19,6 +24,9 @@ class ServerFragment : Fragment() {
 
     private lateinit var binding: FragmentDetailsBinding
     private val viewModel by viewModels<ServerViewModel>()
+
+    @Inject
+    lateinit var currentUserProvider: CurrentUserProvider
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,6 +44,7 @@ class ServerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupData()
+
         binding.loginButton.setOnClickListener {
             //check if all fields are filled
             if (binding.serverName.text.toString().isEmpty() ||
@@ -48,7 +57,7 @@ class ServerFragment : Fragment() {
                     "Merci de compléter tous les champs",
                     Toast.LENGTH_SHORT
                 ).show()
-            }else {
+            } else {
                 val serverEntity = SerEntity(
                     servername = binding.serverName.text.toString(),
                     dbname = binding.dbName.text.toString(),
@@ -56,11 +65,17 @@ class ServerFragment : Fragment() {
                     dbpassword = binding.dbPassword.text.toString()
                 )
                 viewModel.saveServer(serverEntity)
-                val goLogin =
-                    ServerFragmentDirections.actionServerFragmentToLoginFragment(
-                        server = serverEntity
-                    )
-                UssdNavigation.navigate(findNavController(), goLogin)
+
+                if (currentUserProvider.currentUser() == null) {
+                    val goLogin =
+                        ServerFragmentDirections.actionServerFragmentToLoginFragment(
+                            server = serverEntity
+                        )
+                    UssdNavigation.navigate(findNavController(), goLogin)
+                } else
+                    findNavController().popBackStack()
+
+
             }
         }
     }
@@ -70,6 +85,9 @@ class ServerFragment : Fragment() {
         binding.dbName.setText("gwsma_owi")
         binding.userName.setText("gwsma_owi")
         binding.dbPassword.setText("2ZGv7qSp92iHbhp")
+        if (currentUserProvider.currentUser() != null) {
+            binding.loginButton.text = "Sauvegarder"
+        }
     }
 
 }
