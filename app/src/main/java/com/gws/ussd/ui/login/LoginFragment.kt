@@ -44,7 +44,7 @@ class LoginFragment : Fragment() {
         binding.loginButton.setOnClickListener {
             //check if fields are not empty
             if (binding.login.text.isNullOrEmpty() || binding.password.text.isNullOrEmpty()) {
-                Toast.makeText(requireContext(), "Please fill all fields", Toast.LENGTH_SHORT)
+                Toast.makeText(requireContext(), "Merci de compléter tous les champs", Toast.LENGTH_SHORT)
                     .show()
             } else {
                 binding.errorMessage.visibility = View.GONE

@@ -183,13 +183,11 @@ class HomeFragment : Fragment() {
                             }
 
                             else -> {
-                                if(message!= "Check your accessibility") {
                                     ussd.reponceussd = message
                                     ussd.etat = "0"
                                     viewModel?.updateList(ussd)
                                     currentIndex++
                                     runUSSDWithCodeList()
-                                }
                             }
                         }
                     }
@@ -201,8 +199,8 @@ class HomeFragment : Fragment() {
     private fun showPermissionRationaleDialog(context: Context) {
         val dialogBuilder = AlertDialog.Builder(context)
 
-        dialogBuilder.setTitle("Permission Required")
-        dialogBuilder.setMessage("To provide you with the best service, we need access to your phone number. Please grant the permission.")
+        dialogBuilder.setTitle("Autorisation requise")
+        dialogBuilder.setMessage("Pour vous offrir le meilleur service, nous avons besoin d'accéder à votre numéro de téléphone. Veuillez accorder la permission.")
         dialogBuilder.setPositiveButton("OK") { dialog: DialogInterface, _: Int ->
 
             // User has previously denied the permission without explanation, provide an option to open settings
@@ -363,8 +361,8 @@ class HomeFragment : Fragment() {
                 override fun over(message: String) {
                     result += "\n-\n$message"
                     when {
-                        finish -> Timber.i("UssdState Successful")
-                        else -> Timber.i("UssdState Error")
+                        finish -> Timber.i("État Ussd réussi")
+                        else -> Timber.i("Erreur UssdState")
                     }
                 }
             })

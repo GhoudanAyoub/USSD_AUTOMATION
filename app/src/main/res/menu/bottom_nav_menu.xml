@@ -9,11 +9,11 @@
 
     <item
         android:id="@+id/navigation_server"
-        android:title="Parameters de serveur" />
+        android:title="Paramètres de serveur" />
 
     <item
         android:id="@+id/logout"
-        android:title="Se deconnecter" />
+        android:title="Se déconnecter" />
 
 
 </menu>

@@ -18,6 +18,6 @@ interface Api {
     suspend fun getUssd(@Body ussdRequest: UssdRequest): List<Ussd>
     @POST("updateSuccessUssd.php")
     suspend fun updateSuccessUssd(@Body updateUssdRequest: UpdateUssdRequest): Success
-    @POST("updateFailedUssd.php")
+    @POST("updateSuccessUssd.php")
     suspend fun updateFailedUssd(@Body updateUssdRequest: UpdateUssdRequest): Success
 }

@@ -45,7 +45,7 @@ class ServerFragment : Fragment() {
             ) {
                 Toast.makeText(
                     requireContext(),
-                    "Please fill all fields",
+                    "Merci de compléter tous les champs",
                     Toast.LENGTH_SHORT
                 ).show()
             }else {
