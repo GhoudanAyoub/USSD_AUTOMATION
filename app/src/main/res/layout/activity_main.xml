@@ -5,27 +5,23 @@
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/content_white"
-    android:fitsSystemWindows="true"
-    tools:openDrawer="start">
+    android:background="@color/content_white">
 
-    <RelativeLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appBarContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:theme="@style/AppTheme.AppBarOverlay"
-            android:layout_alignParentTop="true">
+            android:theme="@style/AppTheme.AppBarOverlay">
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/content_white"
-                app:popupTheme="@style/AppTheme.PopupOverlay" >
+                app:popupTheme="@style/AppTheme.PopupOverlay">
 
                 <LinearLayout
                     android:id="@+id/CurrentShopInfo"
@@ -56,7 +52,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_weight="1.2"
+                        android:layout_weight="1.1"
                         android:textAlignment="viewStart"
                         android:gravity="center_vertical"
                         android:background="@color/white"
@@ -71,7 +67,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
+                        android:layout_weight="1.2"
                         android:contentDescription="@null"
                         android:src="@drawable/logo" />
                 </LinearLayout>
@@ -80,40 +76,10 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.fragment.app.FragmentContainerView
-            android:name="androidx.navigation.fragment.NavHostFragment"
-            android:id="@+id/nav_host_fragment_main"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:defaultNavHost="true"
-            android:layout_below="@+id/appBarContainer"
-            app:navGraph="@navigation/mobile_navigation" />
-
-        <FrameLayout
-            android:id="@+id/loaderOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_centerInParent="true"
-            android:background="#2E11314F"
-            android:clickable="true"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:visibility="gone">
-
-            <LinearLayout
-                android:layout_width="50dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:background="@color/transparent"
-                app:cardCornerRadius="50dp">
-
-                <com.gws.ui_core.loaders.LoaderView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-            </LinearLayout>
-
-        </FrameLayout>
-    </RelativeLayout>
+        <include
+            android:id="@+id/content_id"
+            layout="@layout/content_main" />
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigationView"

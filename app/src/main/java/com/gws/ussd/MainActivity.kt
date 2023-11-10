@@ -10,32 +10,26 @@ import android.os.Bundle
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
-import android.view.MenuItem
+import android.view.Menu
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.viewModels
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.navigation.NavigationView
 import com.gws.networking.providers.CurrentServerProvider
 import com.gws.networking.providers.CurrentUserProvider
-import dagger.hilt.android.AndroidEntryPoint
 import com.gws.ussd.databinding.ActivityMainBinding
-import com.gws.ussd.ui.home.HomeViewModel
-import com.gws.ussd.ui.login.LoginFragment
 import com.gws.ussd.ui.splash.SplashActivity
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -58,13 +52,14 @@ class MainActivity : AppCompatActivity(){
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupView()
-        setupMenu()
-
         val numberOfSimCards = getNumberOfSimCards(this)
         binding.simNumber.text = StringBuilder()
             .append(numberOfSimCards.toString())
             .append(if (numberOfSimCards == 1) " carte SIM" else " cartes SIM")
+
+        setupView()
+        setupMenu()
+
     }
 
     fun getNumberOfSimCards(context: Context): Int {
@@ -92,7 +87,7 @@ class MainActivity : AppCompatActivity(){
     private fun setupView() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
-            this.setDisplayShowTitleEnabled(false)
+            this.setDisplayShowTitleEnabled(true)
             this.setDisplayShowHomeEnabled(true)
             this.setDisplayHomeAsUpEnabled(true)
             this.setHomeButtonEnabled(true)
@@ -162,14 +157,14 @@ class MainActivity : AppCompatActivity(){
     }
 
     fun showLoader() {
-        if (binding.loaderOverlay?.visibility == View.GONE) {
-            binding.loaderOverlay?.visibility = View.VISIBLE
+        if (binding.contentId.loaderOverlay?.visibility == View.GONE) {
+            binding.contentId.loaderOverlay?.visibility = View.VISIBLE
         }
     }
 
     fun hideLoader() {
-        if (binding.loaderOverlay?.visibility == View.VISIBLE) {
-            binding.loaderOverlay?.visibility = View.GONE
+        if (binding.contentId.loaderOverlay?.visibility == View.VISIBLE) {
+            binding.contentId.loaderOverlay?.visibility = View.GONE
         }
     }
 
@@ -184,4 +179,7 @@ class MainActivity : AppCompatActivity(){
             .addToBackStack(fragment::class.simpleName).commit()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        return super.onCreateOptionsMenu(menu)
+    }
 }

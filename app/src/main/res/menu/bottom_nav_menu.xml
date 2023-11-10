@@ -3,17 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <item
-        android:id="@+id/navigation_home"
-        android:title="@string/title_home" />
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/navigation_home"
+            android:title="@string/title_home" />
 
-    <item
-        android:id="@+id/navigation_server"
-        android:title="Paramètres de serveur" />
+        <item
+            android:id="@+id/navigation_server"
+            android:title="Paramètres de serveur" />
 
-    <item
-        android:id="@+id/logout"
-        android:title="Se déconnecter" />
+        <item
+            android:id="@+id/logout"
+            android:title="Se déconnecter" />
+    </group>
 
 
 </menu>
