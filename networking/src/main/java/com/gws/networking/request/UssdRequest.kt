@@ -11,5 +11,6 @@ data class UssdRequest(
     val userId: String,
     val userSim1: String,
     val userIdaccount: String,
-    val userMaxsim1: String
+    val userMaxsim1: String,
+    val countSim : Int
 )

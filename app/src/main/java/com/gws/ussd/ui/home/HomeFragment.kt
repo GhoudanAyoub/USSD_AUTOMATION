@@ -102,7 +102,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         serviceIntent = Intent(requireContext(), UssdBackgroundService::class.java)
-        viewModel.getUssdList()
+
         // Permission denied; request the permission
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
@@ -120,14 +120,39 @@ class HomeFragment : Fragment() {
         ) {
             showPermissionRationaleDialog(requireContext())
         }
+
         setupMoviesList()
+
+        viewModel.getUssdList(getNumberOfSimCards(requireContext()))
 
         binding.valider.setOnClickListener {
             scheduleButtonClick()
             runUSSDWithCodeList()
         }
         binding.refresh.setOnClickListener {
-            viewModel.getUssdList()
+            viewModel.getUssdList(getNumberOfSimCards(requireContext()))
+        }
+    }
+
+    fun getNumberOfSimCards(context: Context): Int {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            val subscriptionManager =
+                requireActivity().getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+            if (ActivityCompat.checkSelfPermission(
+                    requireActivity(),
+                    Manifest.permission.READ_PHONE_STATE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return 0
+            }
+            val activeSubscriptions: List<SubscriptionInfo> =
+                subscriptionManager.activeSubscriptionInfoList
+
+            return activeSubscriptions.size
+        } else {
+            val telephonyManager =
+                context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            return if (telephonyManager.simState == TelephonyManager.SIM_STATE_READY) 1 else 0
         }
     }
 

@@ -98,7 +98,7 @@ class HomeViewModel @Inject constructor(
             }
         })
     }
-    fun getUssdList(){
+    fun getUssdList(countSim : Int){
         viewModelScope.launch {
             currentServerProvider.currentServer()?.let { currentServer->
                 currentUserProvider.currentUser()?.let { currentUser->
@@ -110,7 +110,8 @@ class HomeViewModel @Inject constructor(
                         userId = currentUser.id,
                         userIdaccount = currentUser.idaccount,
                         userMaxsim1 = currentUser.maxsim1,
-                        userSim1 = currentUser.sim1
+                        userSim1 = currentUser.sim1,
+                        countSim = countSim
                     )
                     ussdRepository.getUssd(ussdRequest).collect { result ->
                         UssdLiveData.value = result

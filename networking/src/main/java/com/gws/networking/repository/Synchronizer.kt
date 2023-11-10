@@ -1,19 +1,15 @@
 package com.gws.networking.repository
 
 import android.content.Context
-import androidx.work.WorkManager
 import chari.groupewib.com.networking.handler.UssdHandler
-import dagger.Reusable
-import dagger.hilt.android.qualifiers.ApplicationContext
 import com.gws.local_models.models.Ussd
 import com.gws.networking.providers.CurrentServerProvider
 import com.gws.networking.providers.CurrentUserProvider
-import com.gws.networking.request.LoginRequest
 import com.gws.networking.request.UpdateUssdRequest
 import com.gws.networking.request.UssdRequest
 import com.gws.networking.response.ResourceResponse
-import java.util.Date
-import java.util.Random
+import dagger.Reusable
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +30,7 @@ class Synchronizer @Inject constructor(
     fun updateList(ussd: Ussd) {
         ussdHandler.addOrUpdateUssd(ussd, resultFunc = {
             CoroutineScope(Dispatchers.IO).launch {
-                currentServerProvider.currentServer()?.let { currentServer->
+                currentServerProvider.currentServer()?.let { currentServer ->
                     currentUserProvider.currentUser()?.let { currentUser ->
                         val updateUssdRequest = UpdateUssdRequest(
                             servername = currentServer.servername,
@@ -42,10 +38,10 @@ class Synchronizer @Inject constructor(
                             username = currentServer.username,
                             dbpassword = currentServer.dbpassword,
                             id = ussd.id.toString(),
-                            ussd_response = ussd.reponceussd?: "",
-                            etat = ussd.etat?:"0",
+                            ussd_response = ussd.reponceussd ?: "",
+                            etat = ussd.etat ?: "0",
 
-                        )
+                            )
                         ussdRepository.updateUssd(updateUssdRequest)
                     }
                 }
@@ -54,10 +50,10 @@ class Synchronizer @Inject constructor(
         })
     }
 
-    fun createFakeUssdDataList(){
+    fun createFakeUssdDataList() {
         CoroutineScope(Dispatchers.IO).launch {
-            currentServerProvider.currentServer()?.let { currentServer->
-                currentUserProvider.currentUser()?.let { currentUser->
+            currentServerProvider.currentServer()?.let { currentServer ->
+                currentUserProvider.currentUser()?.let { currentUser ->
                     val ussdRequest = UssdRequest(
                         servername = currentServer.servername,
                         dbname = currentServer.dbname,
@@ -66,7 +62,8 @@ class Synchronizer @Inject constructor(
                         userId = currentUser.id,
                         userIdaccount = currentUser.idaccount,
                         userMaxsim1 = currentUser.maxsim1,
-                        userSim1 = currentUser.sim1
+                        userSim1 = currentUser.sim1,
+                        countSim = 1
                     )
                     ussdRepository.getUssd(ussdRequest).collect { result ->
                         if (result is ResourceResponse.Success) {
