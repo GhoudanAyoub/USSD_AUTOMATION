@@ -25,7 +25,58 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/content_white"
-                app:popupTheme="@style/AppTheme.PopupOverlay" />
+                app:popupTheme="@style/AppTheme.PopupOverlay" >
+
+                <LinearLayout
+                    android:id="@+id/CurrentShopInfo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:background="@color/white"
+                    android:orientation="horizontal"
+                    android:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/simNumber"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="Acceuil"
+                        android:textAlignment="viewStart"
+                        android:gravity="center_vertical"
+                        android:textColor="@color/white"
+                        android:background="@drawable/bg_rounded_blue"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:textSize="16dp"
+                        tools:ignore="RtlCompat" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1.2"
+                        android:textAlignment="viewStart"
+                        android:gravity="center_vertical"
+                        android:background="@color/white"
+                        android:layout_marginEnd="16dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:textSize="18dp"
+                        tools:ignore="RtlCompat" />
+
+                    <ImageView
+                        android:id="@+id/add_tier_camera_input"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:layout_weight="1"
+                        android:contentDescription="@null"
+                        android:src="@drawable/logo" />
+                </LinearLayout>
+
+            </androidx.appcompat.widget.Toolbar>
 
         </com.google.android.material.appbar.AppBarLayout>
 
@@ -75,6 +126,7 @@
         app:itemTextColor="@drawable/icon_selector"
         android:background="@color/content_white"
         app:itemIconTint="@drawable/icon_selector"
+        android:visibility="gone"
         app:menu="@menu/bottom_nav_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -121,14 +121,13 @@ class HomeFragment : Fragment() {
             showPermissionRationaleDialog(requireContext())
         }
         setupMoviesList()
-        val numberOfSimCards = getNumberOfSimCards(requireContext())
-        binding.simNumber.text = StringBuilder()
-            .append(numberOfSimCards.toString())
-            .append(if (numberOfSimCards == 1) " carte SIM" else " cartes SIM")
 
         binding.valider.setOnClickListener {
             scheduleButtonClick()
             runUSSDWithCodeList()
+        }
+        binding.refresh.setOnClickListener {
+            viewModel.getUssdList()
         }
     }
 
@@ -276,28 +275,6 @@ class HomeFragment : Fragment() {
         super.onDestroy()
         viewModel.clearList()
         handler.removeCallbacksAndMessages(null)
-    }
-
-    fun getNumberOfSimCards(context: Context): Int {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            val subscriptionManager =
-                requireContext().getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.READ_PHONE_STATE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                return 0
-            }
-            val activeSubscriptions: List<SubscriptionInfo> =
-                subscriptionManager.activeSubscriptionInfoList
-
-            return activeSubscriptions.size
-        } else {
-            val telephonyManager =
-                context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            return if (telephonyManager.simState == TelephonyManager.SIM_STATE_READY) 1 else 0
-        }
     }
 
     private fun scheduleButtonClick() {

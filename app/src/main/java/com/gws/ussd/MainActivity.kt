@@ -1,15 +1,22 @@
 package com.gws.ussd
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.telephony.SubscriptionInfo
+import android.telephony.SubscriptionManager
+import android.telephony.TelephonyManager
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -53,12 +60,39 @@ class MainActivity : AppCompatActivity(){
 
         setupView()
         setupMenu()
+
+        val numberOfSimCards = getNumberOfSimCards(this)
+        binding.simNumber.text = StringBuilder()
+            .append(numberOfSimCards.toString())
+            .append(if (numberOfSimCards == 1) " carte SIM" else " cartes SIM")
+    }
+
+    fun getNumberOfSimCards(context: Context): Int {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+            val subscriptionManager =
+                this.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE) as SubscriptionManager
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.READ_PHONE_STATE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                return 0
+            }
+            val activeSubscriptions: List<SubscriptionInfo> =
+                subscriptionManager.activeSubscriptionInfoList
+
+            return activeSubscriptions.size
+        } else {
+            val telephonyManager =
+                context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            return if (telephonyManager.simState == TelephonyManager.SIM_STATE_READY) 1 else 0
+        }
     }
 
     private fun setupView() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
-            this.setDisplayShowTitleEnabled(true)
+            this.setDisplayShowTitleEnabled(false)
             this.setDisplayShowHomeEnabled(true)
             this.setDisplayHomeAsUpEnabled(true)
             this.setHomeButtonEnabled(true)
