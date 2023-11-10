@@ -92,7 +92,6 @@
         app:itemTextColor="@drawable/icon_selector"
         android:background="@color/content_white"
         app:itemIconTint="@drawable/icon_selector"
-        android:visibility="gone"
         app:menu="@menu/bottom_nav_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
