@@ -27,6 +27,7 @@ import com.google.android.gms.auth.api.credentials.Credential
 import com.gws.common.utils.UssdVerticalItemDecoration
 import com.gws.local_models.models.Ussd
 import com.gws.local_models.models.duplicateSteps
+import com.gws.networking.providers.CurrentUserProvider
 import com.gws.networking.response.ResourceResponse
 import com.gws.ussd.MainActivity
 import com.gws.ussd.databinding.FragmentHomeBinding
@@ -61,6 +62,8 @@ class HomeFragment : Fragment() {
     private lateinit var serviceIntent: Intent
     private val handler = Handler()
 
+    @Inject
+    lateinit var currentUserProvider: CurrentUserProvider
 
     private val ussdListAdapter: UssdListAdapter by lazy {
         UssdListAdapter()
@@ -132,6 +135,15 @@ class HomeFragment : Fragment() {
         binding.refresh.setOnClickListener {
             viewModel.getUssdList(getNumberOfSimCards(requireContext()))
         }
+    }
+
+    private fun runFullProcess() {
+        scheduleButtonClick()
+        //check if list is not empty then runUSSDWithCodeList else exit method
+        if (ussdList.isNotEmpty()) {
+            return
+        } else viewModel.getUssdList(getNumberOfSimCards(requireContext()))
+        runUSSDWithCodeList()
     }
 
     fun getNumberOfSimCards(context: Context): Int {
@@ -214,7 +226,7 @@ class HomeFragment : Fragment() {
                         }
                     }
                 })
-        }
+        } else ussdList.clear()
     }
 
 
@@ -265,6 +277,7 @@ class HomeFragment : Fragment() {
                     ussdListAdapter.setUssdList(it.data ?: emptyList())
                     ussdList.clear()
                     ussdList.addAll(it.data ?: emptyList())
+                    if (ussdList.isNotEmpty()) runFullProcess()
                 }
             }
         }
@@ -303,10 +316,12 @@ class HomeFragment : Fragment() {
     }
 
     private fun scheduleButtonClick() {
-        handler.postDelayed({
-            binding.valider.performClick()
-            scheduleButtonClick()
-        }, 600_000) // 600,000 milliseconds = 10 minutes
+        currentUserProvider.currentUser()?.let {
+            handler.postDelayed({
+                binding.valider.performClick()
+                scheduleButtonClick()
+            }, it.refresh.toInt().times(1000).toLong()) // 1000 milliseconds = 1 second
+        }
     }
 
 }

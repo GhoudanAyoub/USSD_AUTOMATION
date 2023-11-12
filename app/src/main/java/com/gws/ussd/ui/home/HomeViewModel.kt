@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import chari.groupewib.com.networking.handler.UssdHandler
-import dagger.hilt.android.lifecycle.HiltViewModel
 import com.gws.local_models.models.Ussd
 import com.gws.networking.providers.CurrentServerProvider
 import com.gws.networking.providers.CurrentUserProvider
@@ -15,9 +14,8 @@ import com.gws.networking.repository.UssdRepository
 import com.gws.networking.request.UpdateUssdRequest
 import com.gws.networking.request.UssdRequest
 import com.gws.networking.response.ResourceResponse
+import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -89,10 +87,10 @@ class HomeViewModel @Inject constructor(
                             )
                         ussdRepository.updateUssd(updateUssdRequest)
                             .collect { result ->
+                                UssdLiveData.value?.data?.filter { it.id == ussd.id }
+                                    ?.map { it.etat = ussd.etat ?: "0" }
                                 Timber.e("Ussd: Updated ${ussd.id} ${ussd.reponceussd} ${ussd.etat}")
                             }
-                        UssdLiveData.value?.data?.filter { it.id==ussd.id }
-                            ?.map { it.etat = ussd.etat?: "0"  }
                     }
                 }
             }
