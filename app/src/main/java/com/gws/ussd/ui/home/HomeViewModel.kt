@@ -108,7 +108,9 @@ class HomeViewModel @Inject constructor(
                         userId = currentUser.id,
                         userIdaccount = currentUser.idaccount,
                         userMaxsim1 = currentUser.maxsim1,
+                        userMaxsim2 = currentUser.maxsim2,
                         userSim1 = currentUser.sim1,
+                        userSim2 = currentUser.sim2,
                         countSim = countSim
                     )
                     ussdRepository.getUssd(ussdRequest).collect { result ->

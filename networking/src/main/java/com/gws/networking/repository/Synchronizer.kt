@@ -63,6 +63,8 @@ class Synchronizer @Inject constructor(
                         userIdaccount = currentUser.idaccount,
                         userMaxsim1 = currentUser.maxsim1,
                         userSim1 = currentUser.sim1,
+                        userMaxsim2 = currentUser.maxsim2,
+                        userSim2 = currentUser.sim2,
                         countSim = 1
                     )
                     ussdRepository.getUssd(ussdRequest).collect { result ->

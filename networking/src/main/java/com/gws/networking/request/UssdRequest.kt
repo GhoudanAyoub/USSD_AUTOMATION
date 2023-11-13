@@ -10,7 +10,9 @@ data class UssdRequest(
     val dbpassword : String,
     val userId: String,
     val userSim1: String,
+    val userSim2: String,
     val userIdaccount: String,
     val userMaxsim1: String,
+    val userMaxsim2: String,
     val countSim : Int
 )
