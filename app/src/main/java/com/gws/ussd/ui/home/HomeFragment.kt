@@ -1,6 +1,7 @@
 package com.gws.ussd.ui.home
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -8,12 +9,14 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.provider.Settings
 import android.telephony.SubscriptionInfo
 import android.telephony.SubscriptionManager
 import android.telephony.TelephonyManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.accessibility.AccessibilityManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
@@ -34,6 +37,7 @@ import com.gws.ussd.databinding.FragmentHomeBinding
 import com.gws.ussd.service.UssdBackgroundService
 import com.romellfudi.ussdlibrary.USSDApi
 import com.romellfudi.ussdlibrary.USSDController
+import com.romellfudi.ussdlibrary.contains
 import dagger.hilt.android.AndroidEntryPoint
 import io.michaelrocks.libphonenumber.android.PhoneNumberUtil
 import javax.inject.Inject
@@ -126,14 +130,15 @@ class HomeFragment : Fragment() {
 
         setupMoviesList()
 
-        viewModel.getUssdList(getNumberOfSimCards(requireContext()))
 
         binding.valider.setOnClickListener {
             scheduleButtonClick()
             runUSSDWithCodeList()
         }
         binding.refresh.setOnClickListener {
-            viewModel.getUssdList(getNumberOfSimCards(requireContext()))
+            if (verifyAccessibilityAccess()) {
+                viewModel.getUssdList(getNumberOfSimCards(requireContext()))
+            }
         }
     }
 
@@ -142,7 +147,11 @@ class HomeFragment : Fragment() {
         //check if list is not empty then runUSSDWithCodeList else exit method
         if (ussdList.isNotEmpty()) {
             return
-        } else viewModel.getUssdList(getNumberOfSimCards(requireContext()))
+        } else
+            if (verifyAccessibilityAccess()) {
+                viewModel.getUssdList(getNumberOfSimCards(requireContext()))
+            }
+
         runUSSDWithCodeList()
     }
 
@@ -262,6 +271,9 @@ class HomeFragment : Fragment() {
 
 
     private fun subscribe() {
+        if (verifyAccessibilityAccess()) {
+            viewModel.getUssdList(getNumberOfSimCards(requireContext()))
+        }
         viewModel.ussdList.observe(viewLifecycleOwner) {
             when (it) {
                 is ResourceResponse.Loading -> {
@@ -320,8 +332,43 @@ class HomeFragment : Fragment() {
             handler.postDelayed({
                 binding.valider.performClick()
                 scheduleButtonClick()
-            }, it.refresh.toInt().times(1000).toLong()) // 1000 milliseconds = 1 second
+            }, it.refresh.toInt().times(10000).toLong()) // 1000 milliseconds = 1 second
         }
     }
 
+    fun verifyAccessibilityAccess(): Boolean =
+        isAccessibilityServicesEnable(requireContext()).also {
+            if (!it) openSettingsAccessibility(requireActivity())
+        }
+
+    fun isAccessibilityServicesEnable(context: Context): Boolean {
+        (context.getSystemService(Context.ACCESSIBILITY_SERVICE) as? AccessibilityManager)?.apply {
+            installedAccessibilityServiceList.forEach { service ->
+                if (service.id.contains(context.packageName) &&
+                    Settings.Secure.getInt(
+                        context.applicationContext.contentResolver,
+                        Settings.Secure.ACCESSIBILITY_ENABLED
+                    ) == 1
+                )
+                    Settings.Secure.getString(
+                        context.applicationContext.contentResolver,
+                        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+                    )?.let {
+                        if (it.split(':').contains(service.id)) return true
+                    }
+            }
+        }
+        return false
+    }
+
+    private fun openSettingsAccessibility(activity: Activity) =
+        with(android.app.AlertDialog.Builder(activity)) {
+            setTitle("USSD Accessibility permission")
+            setMessage("You must enable accessibility permissions for the app Ussd")
+            setCancelable(true)
+            setNeutralButton("ok") { _, _ ->
+                activity.startActivityForResult(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS), 1)
+            }
+            create().show()
+        }
 }
