@@ -109,7 +109,9 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         serviceIntent = Intent(requireContext(), UssdBackgroundService::class.java)
+        if (verifyAccessibilityAccess()) {
 
+        }
         // Permission denied; request the permission
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
@@ -332,7 +334,7 @@ class HomeFragment : Fragment() {
             handler.postDelayed({
                 binding.valider.performClick()
                 scheduleButtonClick()
-            }, it.refresh.toInt().times(10000).toLong()) // 1000 milliseconds = 1 second
+            }, (it.refresh.toInt()*1000).toLong()) // 1000 milliseconds = 1 second
         }
     }
 
