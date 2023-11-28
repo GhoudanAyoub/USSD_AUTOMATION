@@ -109,9 +109,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         serviceIntent = Intent(requireContext(), UssdBackgroundService::class.java)
-        if (verifyAccessibilityAccess()) {
-
-        }
         // Permission denied; request the permission
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
@@ -187,7 +184,7 @@ class HomeFragment : Fragment() {
                 finish = false
                 // Sleep for a moment (optional)
                 try {
-                    Thread.sleep(300) // Sleep for 5 seconds
+                    Thread.sleep(1000) // Sleep for 1 seconds
                 } catch (e: InterruptedException) {
                     e.printStackTrace()
                 }
@@ -196,6 +193,8 @@ class HomeFragment : Fragment() {
             }
         } else {
             // All codes in the list have been processed
+            ussdList.removeAt(currentIndex)
+            ussdListAdapter.setUssdList(ussdList)
         }
     }
 
@@ -204,6 +203,12 @@ class HomeFragment : Fragment() {
             currentCodeIndex = 0
             val ussd = ussdList[currentIndex]
             codeList = ussd.duplicateSteps()
+
+            try {
+                Thread.sleep(3000) // Sleep for 3 seconds
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
 
             ussdApi.callUSSDInvoke(
                 requireActivity(),
@@ -291,7 +296,6 @@ class HomeFragment : Fragment() {
                     ussdListAdapter.setUssdList(it.data ?: emptyList())
                     ussdList.clear()
                     ussdList.addAll(it.data ?: emptyList())
-                    if (ussdList.isNotEmpty()) runFullProcess()
                 }
             }
         }
